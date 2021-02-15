@@ -76,14 +76,8 @@ class CustomClient(Client):
                   evnt['minute'] == currTime.minute and currTime.second <= 10]
         if len(events) > 0:
             print(f'Event started {currTime}')
-            await self._send_tripple_message_to_general('Daily meeting started!')
-
-    async def _send_tripple_message_to_general(self, message: str):
-        await self._generalChannel.send(content=f'@everyone {message}')
-        sleep(.5)
-        await self._generalChannel.send(content=f'@everyone {message}')
-        sleep(.5)
-        await self._generalChannel.send(content=f'@everyone {message}')
+            await self._generalChannel.send(content=f'@everyone Daily meeting started!')
+            sleep(5)
 
 
 try:
