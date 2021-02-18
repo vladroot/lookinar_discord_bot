@@ -49,7 +49,7 @@ class CustomClient(Client):
                 for channel in self._server.channels:
                     if channel.name == 'general':
                         self._generalChannel = channel
-                    elif channel.name == 'General':
+                    elif channel.name == 'Daily':
                         self._generalVoiceChannel = channel
                 break
 
