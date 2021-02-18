@@ -76,7 +76,7 @@ class CustomClient(Client):
         if command == 'daily':
             data = await self._generalVoiceChannel.create_invite(reason='Please come to voice channel!', max_age='300')
             for member in self._members:
-                if member.status == discord.Status.online or member.status == discord.Status.online:
+                if member.status == discord.Status.online or member.status == discord.Status.idle:
                     cnl = await member.create_dm()
                     await cnl.send(data)
             return
