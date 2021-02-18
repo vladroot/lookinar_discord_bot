@@ -37,6 +37,7 @@ class CustomClient(Client):
     _members = []
     _server: Guild = None
     _generalChannel: GuildChannel = None
+    _generalVoiceChannel: GuildChannel = None
 
     async def on_ready(self):
         print(f'{self.user} is connected')
@@ -48,6 +49,8 @@ class CustomClient(Client):
                 for channel in self._server.channels:
                     if channel.name == 'general':
                         self._generalChannel = channel
+                    elif channel.name == 'General':
+                        self._generalVoiceChannel = channel
                 break
 
         self._members = self._server.members
@@ -70,7 +73,14 @@ class CustomClient(Client):
 
         command: str = msg_content.removeprefix('!')
         data: str = ''
-        if command == 'week':
+        if command == 'daily':
+            data = await self._generalVoiceChannel.create_invite(reason='Please come to voice channel!', max_age='300')
+            for member in self._members:
+                if member.status == discord.Status.online or member.status == discord.Status.online:
+                    cnl = await member.create_dm()
+                    await cnl.send(data)
+            return
+        elif command == 'week':
             data = meetings
             if len(data) == 0:
                 data = 'No meetings today.'
@@ -80,7 +90,7 @@ class CustomClient(Client):
                 data = 'No meetings today.'
         elif command.startswith('schedule'):
             to_add: str = command.removeprefix('schedule').lstrip()
-            print(str)
+            print(to_add)
         else:
             data = 'I don\'t know this trick :('
         await message.channel.send(data)
