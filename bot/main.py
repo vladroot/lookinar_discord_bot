@@ -5,7 +5,6 @@ import discord
 from datetime import datetime
 from discord.abc import GuildChannel
 from discord.client import Client
-from discord.guild import Guild
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -35,7 +34,6 @@ def get_day_name(id: int):
 
 class CustomClient(Client):
     _members = []
-    _server: Guild = None
     _generalChannel: GuildChannel = None
     _generalVoiceChannel: GuildChannel = None
 
@@ -43,25 +41,28 @@ class CustomClient(Client):
         print(f'{self.user} is connected')
         for guild in self.guilds:
             if guild.name == serverName:
-                self._server = guild
                 print(f'...to {guild.name}(id: {guild.id})')
 
-                for channel in self._server.channels:
+                for channel in guild.channels:
                     if channel.name == 'general':
                         self._generalChannel = channel
                     elif channel.name == 'Daily':
                         self._generalVoiceChannel = channel
                 break
 
-        self._members = self._server.members
-        members = '\n - '.join([member.name for member in self._members])
-        print(f'Guild Members:\n - {members}')
+        self._members = guild.members
+        membersStr = '\n - '.join([member.name for member in self._members])
+        print(f'Guild Members:\n - {membersStr}')
 
         self.loop.create_task(timed_events(self))
 
     async def on_member_join(self, member):
         print(f'{member.name} joined')
         self._members.append(member)
+
+    async def on_member_remove(self, member):
+        print(f'{member.name} removed')
+        self._members.remove(member)
 
     async def on_message(self, message):
         if message.author == self.user:
@@ -72,7 +73,7 @@ class CustomClient(Client):
             return
 
         command: str = msg_content.removeprefix('!')
-        data: str = ''
+        data: str = 'Available commands:\n!daily\n!week\n!today\n!add\n!remove'
         if command == 'daily':
             data = await self._generalVoiceChannel.create_invite(reason='Please come to voice channel!', max_age='300')
             for member in self._members:
@@ -88,11 +89,43 @@ class CustomClient(Client):
             data = meetings[get_day_name(datetime.utcnow().weekday())]
             if len(data) == 0:
                 data = 'No meetings today.'
-        elif command.startswith('schedule'):
-            to_add: str = command.removeprefix('schedule').lstrip()
-            print(to_add)
-        else:
-            data = 'I don\'t know this trick :('
+        elif command.startswith('remove'):
+            data = 'remove command usage:\n!remove [day] - removes all scheduled events for this day of the week'
+            params: str = command.removeprefix('remove').lstrip()
+            day = params.strip().lower()
+            if day in meetings:
+                meetings[day].clear()
+                data = f'{day} events cleared!'
+        elif command.startswith('add'):
+            data = 'add command usage:\n!add [day] [time] [optional comment]\nexample: !schedule monday 13:30 Daily lunch meeting'
+            params: str = command.removeprefix('add').lstrip()
+            schedule_list = params.split()
+            comment = ''
+            length = len(schedule_list)
+            if length > 2:
+                comment = ' '.join(schedule_list[2:])
+            if length > 1:
+                timeList = schedule_list[1].split(':')
+                if len(timeList) == 2:
+                    day = schedule_list[0].lower()
+                    try:
+                        hour: int = int(timeList[0])
+                        minute: int = int(timeList[1])
+                    except ValueError as ve:
+                        hour = -1
+                        minute = -1
+
+                    if day in meetings and hour in range(0, 23) and minute in range(0, 59):
+                        data = f'Scheduled {day}: {hour}:{minute} - {comment}'
+                        newEvent = {
+                            'hour': hour,
+                            'minute': minute,
+                            'comment': comment
+                        }
+                        meetings[day].append(newEvent)
+                else:
+                    data = 'Incorrect time format. Please use hh:mm'
+
         await message.channel.send(data)
 
     async def SendToGeneral(self, text: str):
@@ -106,8 +139,6 @@ async def timed_events(botClient: CustomClient):
         if dayName in meetings:
             await process_work_day(botClient, dayName, currentTime)
             await sleep(10)
-        else:
-            await sleep(600)
 
 
 async def process_work_day(botClient: CustomClient, dayName: str, currTime: datetime):
@@ -115,8 +146,11 @@ async def process_work_day(botClient: CustomClient, dayName: str, currTime: date
               evnt['minute'] == currTime.minute and currTime.second <= 10]
     if len(events) > 0:
         print(f'Event started {currTime}')
-        await botClient.SendToGeneral(content=f'@everyone Daily meeting started!')
-        sleep(1)
+        comment = 'no comments'
+        if 'comment' in events[0]:
+            comment = events[0]['comment']
+        await botClient.SendToGeneral(text=f'@everyone Daily meeting started! ({comment})')
+        await sleep(1)
 
 
 try:
