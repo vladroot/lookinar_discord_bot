@@ -153,12 +153,17 @@ async def process_work_day(botClient: CustomClient, dayName: str, currTime: date
         await sleep(1)
 
 
-try:
-    myIntents = discord.Intents.default()
-    myIntents.members = True
-    myIntents.presences = True
+def main():
+    try:
+        myIntents = discord.Intents.default()
+        myIntents.members = True
+        myIntents.presences = True
 
-    client = CustomClient(intents=myIntents)
-    client.run(botToken)
-except Exception as e:
-    print(str(e))
+        client = CustomClient(intents=myIntents)
+        client.run(botToken)
+    except Exception as e:
+        print(str(e))
+
+
+if __name__ == '__main__':
+    main()
