@@ -44,7 +44,7 @@ class CustomClient(Client):
                 print(f'...to {guild.name}(id: {guild.id})')
 
                 for channel in guild.channels:
-                    if channel.name == 'general':
+                    if channel.name == 'general' or channel.name == 'общее':
                         self._generalChannel = channel
                     elif channel.name == 'Daily':
                         self._generalVoiceChannel = channel
