@@ -97,7 +97,7 @@ class CustomClient(Client):
                 meetings[day].clear()
                 data = f'{day} events cleared!'
         elif command.startswith('add'):
-            data = 'add command usage:\n!add [day] [time] [optional comment]\nexample: !schedule monday 13:30 Daily lunch meeting'
+            data = 'add command usage:\n!add [day] [time] [optional comment]\nexample: !add monday 13:30 Daily lunch meeting'
             params: str = command.removeprefix('add').lstrip()
             schedule_list = params.split()
             comment = ''
