@@ -1,52 +1,56 @@
 {
     "monday": [
         {
-            "hour": 7,
+            "hour": 6,
             "minute": 0
         },
         {
-            "hour": 14,
+            "hour": 13,
             "minute": 0
         }
     ],
     "tuesday": [
         {
-            "hour": 7,
+            "hour": 6,
             "minute": 0
         },
         {
-            "hour": 14,
+            "hour": 13,
             "minute": 0
         }
     ],
     "wednesday": [
         {
-            "hour": 7,
+            "hour": 6,
             "minute": 0
         },
         {
-            "hour": 14,
+            "hour": 13,
             "minute": 0
         }
     ],
     "thursday": [
         {
-            "hour": 7,
+            "hour": 6,
             "minute": 0
         },
         {
-            "hour": 14,
+            "hour": 13,
             "minute": 0
         }
     ],
     "friday": [
         {
-            "hour": 7,
+            "hour": 6,
+            "minute": 0
+        },
+        {
+            "hour": 10,
             "minute": 0
         },
         {
             "hour": 14,
-            "minute": 0
+            "minute": 30
         }
     ],
     "saturday": [],
